@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WellScore+</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+body {
+  font-family: Arial;
+  background: linear-gradient(to right, #667eea, #764ba2);
+  color: white;
+  text-align: center;
+}
+.container {
+  background: rgba(255,255,255,0.1);
+  padding: 20px;
+  border-radius: 20px;
+  width: 400px;
+  margin: auto;
+}
+input, button {
+  margin: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+}
+button {
+  background: #ff7eb3;
+  color: white;
+}
+.card {
+  background: rgba(0,0,0,0.2);
+  padding: 10px;
+  margin: 10px;
+  border-radius: 10px;
+}
+</style>
+</head>
+<body>
+<h1>WellScore+ Dashboard</h1>
+<div class="container">
+
+<h3>Enter Your Daily Data</h3>
+<input type="number" id="sleep" placeholder="Sleep hours">
+<input type="number" id="stress" placeholder="Stress (1-10)">
+<input type="number" id="study" placeholder="Study hours">
+<input type="number" id="screen" placeholder="Screen time">
+<button onclick="calculateScore()">Calculate</button>
+
+<div id="result"></div>
+<canvas id="chart"></canvas>
+
+</div>
+
+<script>
+let scores = [];
+
+function calculateScore(){
+  let sleep = document.getElementById('sleep').value;
+  let stress = document.getElementById('stress').value;
+  let study = document.getElementById('study').value;
+  let screen = document.getElementById('screen').value;
+
+  let sleepScore = Math.min(sleep * 1.5, 10);
+  let stressScore = 10 - stress;
+  let lifestyle = 10 - screen/2;
+
+  let total = (sleepScore + stressScore + lifestyle)/3;
+  scores.push(total);
+
+  let risk = "Low";
+  if(total < 4) risk = "High";
+  else if(total < 7) risk = "Medium";
+
+  let recommendation = "";
+  if(sleep < 6) recommendation += "Increase sleep. ";
+  if(stress > 7) recommendation += "Try meditation. ";
+  if(screen > 6) recommendation += "Reduce screen time. ";
+
+  document.getElementById('result').innerHTML = `
+    <div class="card">Overall Score: ${total.toFixed(2)}</div>
+    <div class="card">Burnout Risk: ${risk}</div>
+    <div class="card">Advice: ${recommendation}</div>
+  `;
+
+  renderChart();
+}
+
+function renderChart(){
+  new Chart(document.getElementById('chart'), {
+    type: 'line',
+    data: {
+      labels: scores.map((_, i) => i+1),
+      datasets: [{
+        label: 'Wellness Trend',
+        data: scores
+      }]
+    }
+  });
+}
+</script>
+
+</body>
+</html>
